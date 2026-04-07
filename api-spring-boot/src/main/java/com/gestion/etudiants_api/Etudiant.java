@@ -12,6 +12,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import com.gestion.etudiants_api.entity.Departement;
 
 @Entity
 @Table(name = "etudiants")
@@ -28,6 +31,12 @@ public class Etudiant {
     private String cin;
     private String nom;
     private LocalDate dateNaissance;
+    private String email;
+    private int anneePremiereInscription;
+
+    @ManyToOne
+    @JoinColumn(name = "departement_id")
+    private Departement departement;
 
     // CONSTRUCTEUR AJOUTÉ
     public Etudiant(String cin, String nom, LocalDate dateNaissance) {
