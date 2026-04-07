@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des Étudiants</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Liste des Étudiants</h1>
+    <table id="tableEtudiants">
+        <thead>
+            <tr>
+                <th>CIN</th>
+                <th>Nom</th>
+                <th>Date de naissance</th>
+                <th>Âge</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        fetch('/api/etudiants')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#tableEtudiants tbody');
+                tbody.innerHTML = '';
+                data.forEach(etudiant => {
+                    const row = `<tr>
+                        <td>${etudiant.cin}</td>
+                        <td>${etudiant.nom}</td>
+                        <td>${etudiant.dateNaissance}</td>
+                        <td>${etudiant.age || 'N/A'}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>
