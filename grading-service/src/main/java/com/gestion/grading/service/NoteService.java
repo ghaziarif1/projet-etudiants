@@ -1,6 +1,5 @@
 package com.gestion.grading.service;
 
-import com.gestion.grading.config.EtudiantServiceClient;
 import com.gestion.grading.dto.NoteDTO;
 import com.gestion.grading.entity.Note;
 import com.gestion.grading.mapper.NoteMapper;
@@ -17,7 +16,6 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final NoteMapper noteMapper;
-    private final EtudiantServiceClient etudiantServiceClient;
 
     public List<NoteDTO> getAllNotes() {
         return noteRepository.findAll().stream()
@@ -33,11 +31,11 @@ public class NoteService {
 
     public NoteDTO createNote(NoteDTO noteDTO) {
         // Verify student exists
-        try {
-            etudiantServiceClient.getEtudiantById(noteDTO.getStudentId());
-        } catch (Exception e) {
-            throw new RuntimeException("Student not found");
-        }
+        // try {
+        //     etudiantServiceClient.getEtudiantById(noteDTO.getStudentId());
+        // } catch (Exception e) {
+        //     throw new RuntimeException("Student not found");
+        // }
 
         Note note = noteMapper.toEntity(noteDTO);
         Note savedNote = noteRepository.save(note);
@@ -49,11 +47,11 @@ public class NoteService {
                 .orElseThrow(() -> new RuntimeException("Note not found"));
 
         // Verify student exists
-        try {
-            etudiantServiceClient.getEtudiantById(noteDTO.getStudentId());
-        } catch (Exception e) {
-            throw new RuntimeException("Student not found");
-        }
+        // try {
+        //     etudiantServiceClient.getEtudiantById(noteDTO.getStudentId());
+        // } catch (Exception e) {
+        //     throw new RuntimeException("Student not found");
+        // }
 
         existingNote.setStudentId(noteDTO.getStudentId());
         existingNote.setMatiere(noteDTO.getMatiere());

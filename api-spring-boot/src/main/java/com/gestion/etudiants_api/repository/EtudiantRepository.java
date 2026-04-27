@@ -13,5 +13,5 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
     List<Etudiant> findByAnneePremiereInscription(int annee);
 
     // Bonus (utile pour le CRUD) :
-    List<Etudiant> findByDepartementId(Long departementId);
+    List<Etudiant> findByDepartement_Id(Long departementId);
 }

@@ -74,7 +74,7 @@ public class EtudiantService {
     }
 
     public List<EtudiantDTO> findByDepartementId(Long departementId) {
-        return repository.findByDepartementId(departementId)
+        return repository.findByDepartement_Id(departementId)
                 .stream()
                 .map(mapper::toDto)
                 .toList();
