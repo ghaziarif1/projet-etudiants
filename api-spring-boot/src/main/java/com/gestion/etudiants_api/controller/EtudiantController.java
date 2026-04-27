@@ -22,9 +22,12 @@ public class EtudiantController {
 
     @Operation(summary = "Lister tous les étudiants")
     @GetMapping
-    public List<EtudiantDTO> getAll(@RequestParam(required = false) Integer annee) {
+    public List<EtudiantDTO> getAll(@RequestParam(required = false) Integer annee, @RequestParam(required = false) Long departementId) {
         if (annee != null) {
             return service.findByAnnee(annee);   // Q9
+        }
+        if (departementId != null) {
+            return service.findByDepartementId(departementId);
         }
         return service.findAll();
     }

@@ -72,4 +72,11 @@ public class EtudiantService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    public List<EtudiantDTO> findByDepartementId(Long departementId) {
+        return repository.findByDepartementId(departementId)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
+    }
 }

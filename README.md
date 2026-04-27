@@ -135,3 +135,21 @@ La Dockerisation et le déploiement Kubernetes d’un microservice
 L’utilisation de cache Redis pour optimiser les lectures
 La gestion d’erreurs et la documentation API
 La traçabilité via Jira avec des sprints et user stories
+
+## Code Review Conventions
+
+### Règles de Review
+- Toute Pull Request doit être relue dans les 48 heures ouvrées.
+- Les commentaires bloquants (marqués comme "blocking" ou "must-fix") doivent être résolus avant le merge.
+- Les reviews doivent couvrir : fonctionnalité, code quality, tests, et conformité aux standards du projet.
+- Au moins une review approuvée est requise pour le merge.
+- Les auto-reviews sont encouragés pour les développeurs solos, mais une seconde paire d'yeux est préférable.
+
+### Checklist de Review
+- [ ] Code compile sans erreurs
+- [ ] Tests passent (unitaires et d'intégration)
+- [ ] Documentation mise à jour (README, Swagger, etc.)
+- [ ] Pas de secrets ou données sensibles committés
+- [ ] Conformité aux conventions de nommage et architecture
+- [ ] Gestion d'erreurs appropriée
+- [ ] Performance et sécurité considérées

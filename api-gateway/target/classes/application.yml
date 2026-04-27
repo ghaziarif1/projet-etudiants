@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: etudiant-service
+          uri: lb://etudiant-service
+          predicates:
+            - Path=/api/etudiants/**, /api/departements/**
+        - id: grading-service
+          uri: lb://grading-service
+          predicates:
+            - Path=/api/notes/**
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true

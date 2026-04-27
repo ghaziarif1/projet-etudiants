@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  db:
+  postgres:
     image: postgres:16-alpine
     container_name: postgres-etudiants
     environment:
-      POSTGRES_DB: etudiantsdb
+      POSTGRES_DB: etudiants
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
@@ -18,20 +18,75 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-etudiants
+    ports:
+      - "6379:6379"
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  etudiant-service:
     build:
       context: ./api-spring-boot
       dockerfile: Dockerfile
-    container_name: spring-etudiants-api
+    container_name: etudiant-service
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/etudiants
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - postgres
+      - redis
+      - eureka-server
+    restart: unless-stopped
+
+  grading-service:
+    build:
+      context: ./grading-service
+      dockerfile: Dockerfile
+    container_name: grading-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/etudiants
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
+    depends_on:
+      - postgres
+      - eureka-server
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
     ports:
       - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/etudiantsdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
     depends_on:
-      db:
-        condition: service_healthy
+      - eureka-server
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
     restart: unless-stopped
 
 volumes:

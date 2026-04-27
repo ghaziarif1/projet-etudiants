@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'models/etudiant.dart';
+import 'models/departement.dart';
 import 'services/api_service.dart';
 
 void main() {
@@ -25,45 +26,91 @@ class EtudiantsPage extends StatefulWidget {
 }
 
 class _EtudiantsPageState extends State<EtudiantsPage> {
-  late Future<List<Etudiant>> futureEtudiants;
+  late Future<List<Departement>> futureDepartements;
+  List<Etudiant> etudiants = [];
+  Departement? selectedDepartement;
 
   @override
   void initState() {
     super.initState();
-    futureEtudiants = ApiService().fetchEtudiants();
+    futureDepartements = ApiService().fetchDepartements();
+  }
+
+  void _onDepartementChanged(Departement? departement) {
+    setState(() {
+      selectedDepartement = departement;
+      if (departement != null) {
+        ApiService().fetchEtudiantsByDepartement(departement.id).then((data) {
+          setState(() {
+            etudiants = data;
+          });
+        }).catchError((error) {
+          setState(() {
+            etudiants = [];
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur : $error')),
+          );
+        });
+      } else {
+        setState(() {
+          etudiants = [];
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Liste des Étudiants')),
-      body: FutureBuilder<List<Etudiant>>(
-        future: futureEtudiants,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
-          }
+      body: Column(
+        children: [
+          FutureBuilder<List<Departement>>(
+            future: futureDepartements,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Erreur : ${snapshot.error}'));
+              }
 
-          final etudiants = snapshot.data!;
-          return ListView.builder(
-            itemCount: etudiants.length,
-            itemBuilder: (context, index) {
-              final e = etudiants[index];
-              return Card(
-                margin: const EdgeInsets.all(8),
-                child: ListTile(
-                  leading: CircleAvatar(child: Text(e.cin.substring(0, 2))),
-                  title: Text(e.nom),
-                  subtitle: Text('CIN : ${e.cin}'),
-                  trailing: Text(e.dateNaissance),
+              final departements = snapshot.data!;
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: DropdownButtonFormField<Departement>(
+                  value: selectedDepartement,
+                  hint: const Text('Sélectionnez un département'),
+                  items: departements.map((departement) {
+                    return DropdownMenuItem<Departement>(
+                      value: departement,
+                      child: Text(departement.nom),
+                    );
+                  }).toList(),
+                  onChanged: _onDepartementChanged,
                 ),
               );
             },
-          );
-        },
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: etudiants.length,
+              itemBuilder: (context, index) {
+                final e = etudiants[index];
+                return Card(
+                  margin: const EdgeInsets.all(8),
+                  child: ListTile(
+                    leading: CircleAvatar(child: Text(e.cin.substring(0, 2))),
+                    title: Text(e.nom),
+                    subtitle: Text('CIN : ${e.cin}'),
+                    trailing: Text(e.dateNaissance),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
